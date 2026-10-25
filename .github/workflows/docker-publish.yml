@@ -28,5 +28,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/IME-DOCKER-REPOZITORIJA:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/IME-DOCKER-REPOZITORIJA:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/projekt:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/projekt:${{ github.sha }}
