@@ -5,12 +5,39 @@ on:
     branches: [ master, Git-Actions ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  checks: write
+
 env:
-  AZURE_WEBAPP_NAME: Izletko        
+  AZURE_WEBAPP_NAME: Izletko
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/izletko
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Nastavitev .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Unit testi
+        run: dotnet test Projekt.slnx --logger "trx;LogFileName=rezultati.trx" --results-directory ./TestResults
+
+      - name: Porocilo o testih
+        uses: dorny/test-reporter@v1
+        if: ${{ !cancelled() }}
+        with:
+          name: Unit testi
+          path: TestResults/rezultati.trx
+          reporter: dotnet-trx
+
   build-and-deploy:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +50,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-     
       - name: Build in push Docker slike
         uses: docker/build-push-action@v6
         with:
@@ -34,7 +60,6 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-     
       - name: Deploy na Azure Web App
         uses: azure/webapps-deploy@v3
         with:
