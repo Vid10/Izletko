@@ -3,4 +3,5 @@
     <File Path="ukaz.txt" />
   </Folder>
   <Project Path="Projekt/Projekt.csproj" />
+  <Project Path="TestIzletko1/TestIzletko1.csproj" />
 </Solution>
